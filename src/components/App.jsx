@@ -9,6 +9,8 @@ import { Loader } from './Loader/Loader';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectAuthIsLoggedIn } from '../redux/auth/authSliceSelectors';
 import { apiRefreshUser } from '../redux/auth/authSlice';
+import RestrictedRoute from './RestrictedRoute/RestrictedRoute'
+import PrivateRoute from './PrivateRoute/PrivateRoute'
 
 export const App = () => {
   // fetchContacts();
@@ -84,9 +86,9 @@ useEffect(() => {dispatch(apiRefreshUser)}, [dispatch])
       <Suspense fallback={<Loader />}>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/register/*" element={<RegisterPage />} />
-          <Route path="/login/*" element={<LoginPage />} />
-          <Route path="/contacts/*" element={<ContactsPage />} />
+          <Route path="/register/*" element={<RestrictedRoute><RegisterPage /></RestrictedRoute>} />
+          <Route path="/login/*" element={<RestrictedRoute><LoginPage /></RestrictedRoute>} />
+          <Route path="/contacts/*" element={<PrivateRoute> <ContactsPage /></PrivateRoute>} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Suspense>

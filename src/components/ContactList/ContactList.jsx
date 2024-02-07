@@ -21,8 +21,8 @@ const ContactList = () => {
   }, [dispatch]);
 
   const getFilteredContacts = () => {
-    const normalizedFilter = filter.toLowerCase();
-    return contacts.filter(contact =>
+    const normalizedFilter = filter?.toLowerCase(); ///////////////////?
+    return contacts?.filter(contact => /////////////////////////  ?
       contact.name.toLowerCase().includes(normalizedFilter)
     );
   };
@@ -40,7 +40,7 @@ const ContactList = () => {
       {status === STATUSES.error && <div>{error}</div>}
 
       <ul className={css.contactList}>
-        {filteredContacts.map(contact => (
+        {filteredContacts?.map(contact => ( ////////////////////////?
           <li key={contact.id} className={css.contactListItem}>
             <p className={css.contactListText}>
               {contact.name}: {contact.phone}

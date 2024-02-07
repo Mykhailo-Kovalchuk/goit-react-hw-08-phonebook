@@ -1,26 +1,32 @@
 import { createSlice, createAsyncThunk, isAnyOf} from '@reduxjs/toolkit';
-import { STATUSES } from '../../utils/constants';
-import * as apiContacts from '../../services/api'
+// import { STATUSES } from '../../utils/constants';
+// import * as apiContacts from '../../services/api'
+import { $authInstance } from '../../redux/auth/authSlice';
 
 
+// Операції
+// 1) Операція отримання контактів
 export const apiGetContacts = createAsyncThunk(
-  'contacts/fetchAll',
+  'contacts/apiGetContacts',
   async (_, thunkApi) => {
     try {
-      const contacts = await apiContacts.fetchContacts();
-      return contacts;
+      const contacts = await $authInstance.get('/contacts');
+      console.log(contacts.data);
+      return contacts.data;
     } catch (error) {
       return thunkApi.rejectWithValue(error.message);
     }
   }
 );
   
-
+// 2) Операція додавання контактів
 export const apiAddContact = createAsyncThunk(
   'contacts/apiAddContact',
-  async (contact, thunkApi) => {
+  async (contactData, thunkApi) => {
     try {
-      const newContact = await apiContacts.addContact(contact);
+      const newContact = await $authInstance.post('/contacts', contactData);
+console.log(newContact)
+
       return newContact;
     } catch (error) {
       return thunkApi.rejectWithValue(error.message);
@@ -28,13 +34,16 @@ export const apiAddContact = createAsyncThunk(
   }
 );
   
+// 1) Операція видалення контактів
 export const apiDeleteContact = createAsyncThunk(
   'contacts/apiDeleteContact',
-  async (id, thunkApi) => {
+  async (contactId, thunkApi) => {
     try {
-      const contacts = await apiContacts.deleteContact(id);
-      // console.log(id);
-      return contacts;
+      const contacts = await $authInstance.delete(`/contacts/${contactId}`);
+
+      console.log(contactId);
+      console.log(contacts);
+      return contacts.data;
     } catch (error) {
       return thunkApi.rejectWithValue(error.message);
     }
@@ -43,12 +52,18 @@ export const apiDeleteContact = createAsyncThunk(
 
 
 const initialState = {
-  contacts: {
-    items: [],
-    isLoading: false,
-    error: null
-  },
-  filter: ""
+  contacts: null,
+  isLoading: false,
+  error: null
+
+
+  //Попередній стан
+  // contacts: {
+  //   items: [],
+  //   isLoading: false,
+  //   error: null
+  // },
+  // filter: ""
 }
 
 const contactsSlice = createSlice({
@@ -72,8 +87,8 @@ const contactsSlice = createSlice({
       //   state.contacts.error = null;
       // })
       .addCase(apiGetContacts.fulfilled, (state, action) => {
-        state.contacts.status = STATUSES.success;
-        state.contacts.items = action.payload;
+        state.isLoading = false;
+        state.contacts = action.payload;
       })
       // .addCase(apiGetContacts.rejected, (state, action) => {  ------ дивитись нижче, замість повторюваних кейсів ми використали 
       // addMatcher і фактично об`єднали їх  і скоротили код ---- ТАК РОБЛЮ ДЛЯ API ОТРИМАННЯ, ВИДАЛЕННЯ ТА ДОДАВАННЯ
@@ -85,8 +100,8 @@ const contactsSlice = createSlice({
       //   state.contacts.error = null;
       // })
       .addCase(apiAddContact.fulfilled, (state, action) => {
-        state.contacts.status = STATUSES.success;
-        state.contacts.items.push(action.payload);
+        state.isLoading = false;
+        state.contacts =  [...state.contacts, action.payload];
       })
       // .addCase(apiAddContact.rejected, (state, action) => { ------ дивитись нижче, замість повторюваних кейсів ми використали 
       // addMatcher і фактично об`єднали їх  і скоротили код
@@ -100,10 +115,10 @@ const contactsSlice = createSlice({
       // })
       .addCase(apiDeleteContact.fulfilled, (state, action) => {
         // console.log(action);
-        state.contacts.status = STATUSES.success;
-        state.contacts.items = state.contacts.items.filter(contact => {
+        state.isLoading = false;
+        state.contacts = state.contacts.filter(contact => {
           // console.log(action.payload);
-          return contact.id !== action.payload;
+          return contact.id !== action.payload.id;
         });
         // console.log(action.payload);
       })
@@ -118,15 +133,16 @@ const contactsSlice = createSlice({
       apiAddContact.rejected,
       apiDeleteContact.rejected
     ), (state, action) => {
-        state.contacts.status = STATUSES.error;
-        state.contacts.error = action.payload;
+        state.isLoading = false;
+        state.error = action.payload;
     })
-    .addMatcher(isAnyOf( apiGetContacts.pending,
+    .addMatcher(isAnyOf( 
+        apiGetContacts.pending,
         apiAddContact.pending,
         apiDeleteContact.pending
-      ), (state, _) => {
-          state.contacts.status = STATUSES.pending;
-          state.contacts.error = null;
+      ), (state) => {
+          state.isLoading = true;
+          state.error = null;
         });
   },
 });
@@ -139,75 +155,5 @@ export const { setFilter } = contactsSlice.actions;
 export const contactsReducer = contactsSlice.reducer;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import { createSlice } from '@reduxjs/toolkit';
-
-// const initialState = {
-//   contacts: [],
-//   filter: '',
-// };
-
-// const contactsSlice = createSlice({
-//   // Ім'я слайсу
-//   name: 'contacts',
-//   // Початковий стан редюсера слайсу
-//   initialState,
-//   // Об'єкт редюсерів
-//   reducers: {
-//     addContact(state, action) {
-//       // state.friends = [...state.friends, action.payload];
-//       state.contacts.push(action.payload);
-//     },
-//     removeContact(state, action) {
-//       // const friendIndex = state.friends.findIndex(
-//       //   el => el.id === action.payload
-//       // );
-
-//       // state.friends.splice(friendIndex, 1);
-
-//       state.contacts = state.contacts.filter(
-//         contact => contact.id !== action.payload
-//       );
-//     },
-//     setFilter(state, action) {
-//       state.filter = action.payload;
-//     },
-//   },
-// });
-
-// // Генератори екшенів
-// export const { addContact, setFilter, removeContact } = contactsSlice.actions;
-// // Редюсер слайсу
-// export const contactsReducer = contactsSlice.reducer;
 
 

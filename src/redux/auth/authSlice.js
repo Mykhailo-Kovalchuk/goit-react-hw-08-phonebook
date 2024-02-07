@@ -8,8 +8,13 @@ export const $authInstance = axios.create({
   baseURL: 'https://connections-api.herokuapp.com',
 });
 
+// функція створення токену (точніше його отримання та запису)
 const setToken = token => {
   $authInstance.defaults.headers.common.Authorization = `Bearer ${token}`; // Саме так витягуємо токет з хедерів запиту, для авторизації.
+};
+// функція видалення токену
+const clearToken = () => { // нічого не приймає
+  $authInstance.defaults.headers.common.Authorization = ''; // просто замість токену в хедері запиту, записуємо порожній рядок, тобто очищуємо.
 };
 
 // створюємо операції
@@ -29,7 +34,7 @@ export const apiRegisterUser = createAsyncThunk(
 
       return data;
     } catch (error) {
-      thunkApi.rejectWithValue(error.message);
+      return   thunkApi.rejectWithValue(error.message);
     }
   }
 );
@@ -47,11 +52,12 @@ export const apiLoginUser = createAsyncThunk(
       // треба зберегти відповідь від бекенду про нового зареєстрованого користувача. - для цього використовуємо функцію setToken()
       // у цьому випадку треба зберегти токен, щоб розпізнити зареєстрованого користувача
       setToken(data.token);
-      Notiflix.Notify.success('Success Login');
+      // Notiflix.Notify.success('Success Login');
       return data;
     } catch (error) {
-      thunkApi.rejectWithValue(error.message);
       Notiflix.Notify.failure('Wrong Login');
+      return   thunkApi.rejectWithValue(error.message);
+     
     }
   }
 );
@@ -62,7 +68,6 @@ export const apiRefreshUser = createAsyncThunk(
   async (_, thunkApi) => {
     const state = thunkApi.getState();
     console.log(state);
-
     const token = state.auth.token;
 
     // if (!token) return thunkApi.rejectWithValue("You don't have a token!");
@@ -79,10 +84,32 @@ export const apiRefreshUser = createAsyncThunk(
 
       return data;
     } catch (error) {
-      thunkApi.rejectWithValue(error.message);
+      return  thunkApi.rejectWithValue(error.message);
     }
   }
 );
+
+// 4) Операція logout користувача
+export const apiLogoutUser = createAsyncThunk(
+  'auth/apiLogoutUser',
+  async (_, thunkApi) => {
+    try {
+     await $authInstance.post('/users/logout');
+// при логауті ніяких даних не отримуємо, а лише викликаємо функцію. 
+// так само і не будемо встановлювати токен, а навпаки видаляти
+
+      // Найголовніше -  тепер треба зберегти відповідь від бекенду про нового зареєстрованого користувача. -
+      // для цього використовуємо функцію setToken() яку ми створили раніше
+      clearToken();
+      return;
+    } catch (error) {
+      return thunkApi.rejectWithValue(error.message);
+    }
+  }
+);
+
+
+
 
 const initialState = {
   token: null,
@@ -121,11 +148,20 @@ export const authSlice = createSlice({
         state.isLoggedIn = true;
         state.userData = action.payload;
       })
+      .addCase(apiLogoutUser.fulfilled, () => {
+        // при успішному логауті повертаємо початковий стан. Або переписуючи кожне поле як нижче 
+        // state.isLoading = false;
+        // state.isLoggedIn = false;
+        // state.userData =  null;
+        // або ж просто повернувши початковий стан
+        return initialState;
+      })
       .addMatcher(
         isAnyOf(
           apiLoginUser.pending,
           apiRegisterUser.pending,
-          apiRefreshUser.pending
+          apiRefreshUser.pending,
+          apiLogoutUser.pending
         ),
         (state, action) => {
           state.isLoading = true;
@@ -136,7 +172,8 @@ export const authSlice = createSlice({
         isAnyOf(
           apiLoginUser.rejected,
           apiRegisterUser.rejected,
-          apiRefreshUser.rejected
+          apiRefreshUser.rejected,
+          apiLogoutUser.rejected
         ),
         (state, action) => {
           state.isLoading = false;

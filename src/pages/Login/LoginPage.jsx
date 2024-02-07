@@ -1,11 +1,9 @@
-import React from 'react'
+import React from 'react';
 
 import { useDispatch } from 'react-redux';
 import { apiLoginUser } from '../../redux/auth/authSlice';
 
-
 const LoginPage = () => {
-
   const dispatch = useDispatch();
 
   const onSubmit = event => {
@@ -18,12 +16,10 @@ const LoginPage = () => {
       password,
     };
 
-console.log(formData);
-
+    console.log(formData);
 
     dispatch(apiLoginUser(formData));
   };
-
 
   return (
     <div>
@@ -52,7 +48,7 @@ console.log(formData);
         <button type="submit">Sign In</button>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default LoginPage
+export default LoginPage;
