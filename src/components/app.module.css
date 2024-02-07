@@ -1,0 +1,33 @@
+.appContainer {
+    max-width: 1240px;
+    margin: 0 auto;
+}
+
+
+.header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 40px;
+    font-size: 24px;
+    text-decoration: none;
+    color: black;
+    border-bottom: 2px solid black;
+
+    padding: 15px;
+}
+
+.navLink{
+    padding: 5px;
+    text-decoration: none;
+    color: black;
+}
+
+.active {
+    border: 1px solid black;
+    border-radius: 10px;
+    background-color: black;
+    color: white;
+    text-decoration: none;
+}

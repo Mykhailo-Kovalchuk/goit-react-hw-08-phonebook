@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk} from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, isAnyOf} from '@reduxjs/toolkit';
 import { STATUSES } from '../../utils/constants';
 import * as apiContacts from '../../services/api'
 
@@ -42,8 +42,6 @@ export const apiDeleteContact = createAsyncThunk(
 );
 
 
-
-
 const initialState = {
   contacts: {
     items: [],
@@ -61,21 +59,6 @@ const contactsSlice = createSlice({
   // Об'єкт редюсерів
 
   reducers: {
-  //   addContact(state, action) {
-  //     // state.friends = [...state.friends, action.payload];
-  //     state.contacts.push(action.payload);
-  //   },
-  //   removeContact(state, action) {
-  //     // const friendIndex = state.friends.findIndex(
-  //     //   el => el.id === action.payload
-  //     // );
-
-  //     // state.friends.splice(friendIndex, 1);
-
-  //     state.contacts = state.contacts.filter(
-  //       contact => contact.id !== action.payload
-  //     );
-  //   },
     setFilter(state, action) {
       state.filter = action.payload;
     },
@@ -83,34 +66,38 @@ const contactsSlice = createSlice({
 
   extraReducers: builder => {
     builder
-      .addCase(apiGetContacts.pending, (state, _) => {
-        state.contacts.status = STATUSES.pending;
-        state.contacts.error = null;
-      })
+      // .addCase(apiGetContacts.pending, (state, _) => { ------- Для пендінгу теж використовуємо addMatcher - це значно зменшує код. 
+      // Фактично все закоментоване можна видалити, але залишаю, як пояснення
+      //   state.contacts.status = STATUSES.pending;
+      //   state.contacts.error = null;
+      // })
       .addCase(apiGetContacts.fulfilled, (state, action) => {
         state.contacts.status = STATUSES.success;
         state.contacts.items = action.payload;
       })
-      .addCase(apiGetContacts.rejected, (state, action) => {
-        state.contacts.status = STATUSES.error;
-        state.contacts.error = action.payload;
-      })
-      .addCase(apiAddContact.pending, (state, _) => {
-        state.contacts.status = STATUSES.pending;
-        state.contacts.error = null;
-      })
+      // .addCase(apiGetContacts.rejected, (state, action) => {  ------ дивитись нижче, замість повторюваних кейсів ми використали 
+      // addMatcher і фактично об`єднали їх  і скоротили код ---- ТАК РОБЛЮ ДЛЯ API ОТРИМАННЯ, ВИДАЛЕННЯ ТА ДОДАВАННЯ
+        // state.contacts.status = STATUSES.error;
+        // state.contacts.error = action.payload;
+      // })
+      // .addCase(apiAddContact.pending, (state, _) => {
+      //   state.contacts.status = STATUSES.pending;
+      //   state.contacts.error = null;
+      // })
       .addCase(apiAddContact.fulfilled, (state, action) => {
         state.contacts.status = STATUSES.success;
         state.contacts.items.push(action.payload);
       })
-      .addCase(apiAddContact.rejected, (state, action) => {
-        state.contacts.status = STATUSES.error;
-        state.contacts.error = action.payload;
-      })
-      .addCase(apiDeleteContact.pending, (state, _) => {
-        state.contacts.status = STATUSES.pending;
-        state.contacts.error = null;
-      })
+      // .addCase(apiAddContact.rejected, (state, action) => { ------ дивитись нижче, замість повторюваних кейсів ми використали 
+      // addMatcher і фактично об`єднали їх  і скоротили код
+
+        // state.contacts.status = STATUSES.error;
+        // state.contacts.error = action.payload;
+      // })
+      // .addCase(apiDeleteContact.pending, (state, _) => {
+      //   state.contacts.status = STATUSES.pending;
+      //   state.contacts.error = null;
+      // })
       .addCase(apiDeleteContact.fulfilled, (state, action) => {
         // console.log(action);
         state.contacts.status = STATUSES.success;
@@ -120,10 +107,27 @@ const contactsSlice = createSlice({
         });
         // console.log(action.payload);
       })
-      .addCase(apiDeleteContact.rejected, (state, action) => {
+      // .addCase(apiDeleteContact.rejected, (state, action) => { ------ дивитись нижче, замість повторюваних кейсів ми використали 
+      // addMatcher і фактично об`єднали їх  і скоротили код
+
+        // state.contacts.status = STATUSES.error;
+        // state.contacts.error = action.payload;
+      // })
+    .addMatcher(isAnyOf(   // де логіка дублюється можна використовувати addMatcher, набагато зручніше працювати з кодом і візуально теж краще сприймається.
+      apiGetContacts.rejected,
+      apiAddContact.rejected,
+      apiDeleteContact.rejected
+    ), (state, action) => {
         state.contacts.status = STATUSES.error;
         state.contacts.error = action.payload;
-      });
+    })
+    .addMatcher(isAnyOf( apiGetContacts.pending,
+        apiAddContact.pending,
+        apiDeleteContact.pending
+      ), (state, _) => {
+          state.contacts.status = STATUSES.pending;
+          state.contacts.error = null;
+        });
   },
 });
 

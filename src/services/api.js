@@ -22,3 +22,29 @@ export const deleteContact = async contactId => {
   await instance.delete(`/contacts/${contactId}`);
   return contactId;
 };
+
+
+// import axios from 'axios';
+
+// const instance = axios.create({
+//   baseURL: 'https://connections-api.herokuapp.com',
+// });
+
+// // функція отримання даних (контактів) з бекенду
+// export const fetchContacts = async () => {
+//   const contactsResp = await instance.get('/contacts');
+//   console.log(contactsResp);
+//   return contactsResp.data;
+// };
+
+// // функція передачі (створення) даних  (контактів) до бекенду
+// export const addContact = async contact => {
+//   const response = await instance.post('/contacts', contact);
+//   return response.data;
+// };
+
+// // функція видалення даних  (контактів) з бекенду
+// export const deleteContact = async contactId => {
+//   await instance.delete(`/contacts/${contactId}`);
+//   return contactId;
+// };
