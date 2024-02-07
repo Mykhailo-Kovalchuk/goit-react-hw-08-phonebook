@@ -1,13 +1,14 @@
 // Компонент App на redux - дуже мало коду, логіка виконується в компонентах, де через useSelector та useDispatch
 // безпосередньо зі стору беруться всі дані які необхідні і вносяться зміни.
 
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import { Route, Routes, Navigate, NavLink } from 'react-router-dom';
 // import { fetchContacts } from '../services/api';
 import css from './app.module.css';
 import { Loader } from './Loader/Loader';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { selectAuthIsLoggedIn } from '../redux/auth/authSliceSelectors';
+import { apiRefreshUser } from '../redux/auth/authSlice';
 
 export const App = () => {
   // fetchContacts();
@@ -19,6 +20,12 @@ export const App = () => {
   const LoginPage = lazy(() => import('../pages/Login/LoginPage'));
   const ContactsPage = lazy(() => import('../pages/Contacts/ContactsPage'));
   const UserMenu = lazy(() => import('../components/UserMenu/UserMenu'));
+
+  // Під час першого рендеру  надсилаємо запит в стан і дивимось чи є там токен, якщо так, тоді підтягуємо його і додаємо в хедерси, щоб користувач був залогований. 
+const dispatch = useDispatch();
+useEffect(() => {dispatch(apiRefreshUser)}, [dispatch])
+
+
 
   return (
     <div className={css.appContainer}>

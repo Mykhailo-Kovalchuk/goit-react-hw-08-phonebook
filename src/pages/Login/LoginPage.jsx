@@ -3,6 +3,7 @@ import React from 'react'
 import { useDispatch } from 'react-redux';
 import { apiLoginUser } from '../../redux/auth/authSlice';
 
+
 const LoginPage = () => {
 
   const dispatch = useDispatch();
@@ -17,7 +18,8 @@ const LoginPage = () => {
       password,
     };
 
-console.log(formData)
+console.log(formData);
+
 
     dispatch(apiLoginUser(formData));
   };

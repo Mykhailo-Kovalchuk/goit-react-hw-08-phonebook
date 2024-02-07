@@ -48,3 +48,23 @@ export const deleteContact = async contactId => {
 //   await instance.delete(`/contacts/${contactId}`);
 //   return contactId;
 // };
+
+
+const instance2 = axios.create({
+  baseURL: 'https://connections-api.herokuapp.com',
+});
+
+// функція отримання даних (контактів) з бекенду
+export const fetchContacts2 = async () => {
+
+try {
+  const contactsResp = await instance2.get('/contacts');
+  console.log(contactsResp);
+  return contactsResp.data;
+} catch (error) {
+  console.log(error)
+}
+
+};
+
+
