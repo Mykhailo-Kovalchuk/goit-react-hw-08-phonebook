@@ -1,6 +1,6 @@
 // import { Component } from 'react';
 import css from './contactForm.module.css';
-import { nanoid } from 'nanoid';
+// import { nanoid } from 'nanoid';
 
 import { useState } from 'react';
 
@@ -13,14 +13,16 @@ const ContactForm = () => {
   const dispatch = useDispatch();
   const contacts = useSelector(state => state.contacts.contacts.items);
 
-  const handleFromSubmit = event => {
+  const handleFormSubmit = event => {
     event.preventDefault();
     // const form = event.currentTarget;
     // console.log(form.elements);
     // const name = form.elements.name.value;
     // const phone = form.elements.phone.value;
-    const id = nanoid(5);
-    const formData = { id, name, phone };
+    // const id = nanoid(5);
+    // const formData = { id, name, phone };
+    const formData = { name, phone };
+    console.log(formData)
 
     if (
       contacts.some(
@@ -38,7 +40,7 @@ const ContactForm = () => {
   };
 
   return (
-    <form className={css.contactForm} onSubmit={handleFromSubmit}>
+    <form className={css.contactForm} onSubmit={handleFormSubmit}>
       <h4 className={css.formTitle}>Name</h4>
       <label className={css.formLabel}>
         <input
