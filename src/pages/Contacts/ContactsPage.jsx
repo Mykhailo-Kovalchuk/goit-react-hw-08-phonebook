@@ -1,29 +1,12 @@
-import React, { useEffect } from 'react'
-import { useDispatch } from 'react-redux';
 // import { apiRegisterUser } from '../redux/auth/authSlice';
 import { ContactForm } from '../../components/ContactForm/ContactForm';
 import { Filter } from '../../components/Filter/Filter';
 import { ContactList } from '../../components/ContactList/ContactList';
-// import { useDispatch, useSelector } from 'react-redux';
-// import { selectContacts, selectContactsError, selectContactsIsLoading } from '../../redux/contacts/contactsSlice.selectors';
-import { apiGetContacts } from '../../redux/contacts/contactsSlice';
-
+import css from './ContactsPage.module.css'
 
 const ContactsPage = () => {
-const dispatch = useDispatch();
-
-// const contacts = useSelector(selectContacts);
-// const isLoading = useSelector(selectContactsIsLoading);
-// const error = useSelector(selectContactsError);
-
-// console.log(`contacts: ${contacts}, loading: ${isLoading}, error: ${error}`);
-
-useEffect(() => {
-  dispatch(apiGetContacts())
-}, [dispatch])
-
   return (
-      <div
+    <div
       style={{
         // height: '100vh',
         display: 'flex',
@@ -34,13 +17,13 @@ useEffect(() => {
         color: '#010101',
       }}
     >
-      <h1>Phonebook</h1>
+      <p className={css.text}>Add new contact to your phonebook</p>
       <ContactForm />
-      <h2>Contacts</h2>
+      <p className={css.text}>Your contacts</p>
       <Filter />
       <ContactList />
     </div>
-  )
-}
+  );
+};
 
-export default ContactsPage
+export default ContactsPage;

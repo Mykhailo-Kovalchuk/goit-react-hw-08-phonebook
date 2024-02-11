@@ -22,29 +22,31 @@ const ContactForm = () => {
     // const phone = form.elements.phone.value;
     // const id = nanoid(5);
     // const formData = { id, name, phone };
-   
-    const name = event.currentTarget.elements.contactName.value;
+
+    let name = event.currentTarget.elements.contactName.value;
     const number = event.currentTarget.elements.contactNumber.value;
     const formData = { name, number };
-    console.log(formData)
+    console.log(formData);
 
     if (
       contacts?.some(
-        contact => contact.name && contact.name.toLowerCase() === name.toLowerCase()
+        contact =>
+          contact.name && contact.name.toLowerCase() === name.toLowerCase()
       )
     ) {
       alert(`${name} is already in your contacts`);
       return;
     }
 
-    dispatch(apiAddContact(formData))
-    .unwrap()
-    .then(() => {
-      console.log('Contact was successfully added!');
-    }).catch((error) => console.error());;
+    dispatch(apiAddContact(formData));
+    // .unwrap()
+    // .then(() => {
+    // }).catch((error) => console.error());;
     // Очистка форми
     // setName('');
     // setPhone('');
+    event.currentTarget.elements.contactName.value = ''; // очистка форми після сабміту
+    event.currentTarget.elements.contactNumber.value = '';
   };
 
   return (

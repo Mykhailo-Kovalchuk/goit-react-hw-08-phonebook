@@ -13,7 +13,8 @@ const setToken = token => {
   $authInstance.defaults.headers.common.Authorization = `Bearer ${token}`; // Саме так витягуємо токет з хедерів запиту, для авторизації.
 };
 // функція видалення токену
-const clearToken = () => { // нічого не приймає
+const clearToken = () => {
+  // нічого не приймає
   $authInstance.defaults.headers.common.Authorization = ''; // просто замість токену в хедері запиту, записуємо порожній рядок, тобто очищуємо.
 };
 
@@ -31,10 +32,11 @@ export const apiRegisterUser = createAsyncThunk(
       // Найголовніше -  тепер треба зберегти відповідь від бекенду про нового зареєстрованого користувача. -
       // для цього використовуємо функцію setToken() яку ми створили раніше
       setToken(data.token);
-
+      Notiflix.Notify.success('Your regestration has been success!');
       return data;
     } catch (error) {
-      return   thunkApi.rejectWithValue(error.message);
+      Notiflix.Notify.failure('Your regestration has been failed!');
+      return thunkApi.rejectWithValue(error.message);
     }
   }
 );
@@ -52,17 +54,36 @@ export const apiLoginUser = createAsyncThunk(
       // треба зберегти відповідь від бекенду про нового зареєстрованого користувача. - для цього використовуємо функцію setToken()
       // у цьому випадку треба зберегти токен, щоб розпізнити зареєстрованого користувача
       setToken(data.token);
-      // Notiflix.Notify.success('Success Login');
+      Notiflix.Notify.success(`Welcome ${data.user.name}`);
       return data;
     } catch (error) {
-      Notiflix.Notify.failure('Wrong Login');
-      return   thunkApi.rejectWithValue(error.message);
-     
+      Notiflix.Notify.failure('Wrong  userlogin or password');
+      return thunkApi.rejectWithValue(error.message);
     }
   }
 );
 
-// 3) Операція оновлення сторінки
+// 3) Операція logout користувача
+export const apiLogoutUser = createAsyncThunk(
+  'auth/apiLogoutUser',
+  async (_, thunkApi) => {
+    try {
+      await $authInstance.post('/users/logout');
+      // при логауті ніяких даних не отримуємо, а лише викликаємо функцію.
+      // так само і не будемо встановлювати токен, а навпаки видаляти
+      Notiflix.Notify.success('Bye! See you later!');
+      // Найголовніше -  тепер треба зберегти відповідь від бекенду про нового зареєстрованого користувача. -
+      // для цього використовуємо функцію setToken() яку ми створили раніше
+      clearToken();
+      return;
+    } catch (error) {
+      Notiflix.Notify.failure('Logout unsuccess!');
+      return thunkApi.rejectWithValue(error.message);
+    }
+  }
+);
+
+// 4) Операція оновлення сторінки
 export const apiRefreshUser = createAsyncThunk(
   'auth/apiRefreshUser',
   async (_, thunkApi) => {
@@ -70,9 +91,11 @@ export const apiRefreshUser = createAsyncThunk(
     console.log(state);
     const token = state.auth.token;
 
-    // if (!token) return thunkApi.rejectWithValue("You don't have a token!");
+    if (!token) return thunkApi.rejectWithValue("You don't have a token!");
+
     try {
       setToken(token);
+
       const { data } = await $authInstance.get('/users/current');
 
       // повинен повернутись об`єкт { email: 'wewewe@gmail.com, password: 'ssdwqeqe213' }
@@ -84,39 +107,18 @@ export const apiRefreshUser = createAsyncThunk(
 
       return data;
     } catch (error) {
-      return  thunkApi.rejectWithValue(error.message);
-    }
-  }
-);
-
-// 4) Операція logout користувача
-export const apiLogoutUser = createAsyncThunk(
-  'auth/apiLogoutUser',
-  async (_, thunkApi) => {
-    try {
-     await $authInstance.post('/users/logout');
-// при логауті ніяких даних не отримуємо, а лише викликаємо функцію. 
-// так само і не будемо встановлювати токен, а навпаки видаляти
-
-      // Найголовніше -  тепер треба зберегти відповідь від бекенду про нового зареєстрованого користувача. -
-      // для цього використовуємо функцію setToken() яку ми створили раніше
-      clearToken();
-      return;
-    } catch (error) {
       return thunkApi.rejectWithValue(error.message);
     }
   }
 );
 
-
-
-
 const initialState = {
   token: null,
+  userData: null,
   isLoggedIn: false,
   error: null,
   isLoading: false,
-  userData: null,
+
   // userData: {
   //     name: null,
   //     email: null,
@@ -149,7 +151,7 @@ export const authSlice = createSlice({
         state.userData = action.payload;
       })
       .addCase(apiLogoutUser.fulfilled, () => {
-        // при успішному логауті повертаємо початковий стан. Або переписуючи кожне поле як нижче 
+        // при успішному логауті повертаємо початковий стан. Або переписуючи кожне поле як нижче
         // state.isLoading = false;
         // state.isLoggedIn = false;
         // state.userData =  null;
@@ -163,7 +165,7 @@ export const authSlice = createSlice({
           apiRefreshUser.pending,
           apiLogoutUser.pending
         ),
-        (state, action) => {
+        state => {
           state.isLoading = true;
           state.error = null;
         }

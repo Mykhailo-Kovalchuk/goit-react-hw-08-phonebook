@@ -9,6 +9,7 @@
 }
 .formTitle {
   margin: 0 auto;
+  font-size: 20px;
 }
 .formLabel {
   display: flex;
