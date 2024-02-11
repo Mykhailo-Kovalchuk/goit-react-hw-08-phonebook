@@ -22,19 +22,19 @@ export const apiGetContacts = createAsyncThunk(
 // 2) Операція додавання контактів
 export const apiAddContact = createAsyncThunk(
   'contacts/apiAddContact',
-  async (contactData, thunkApi) => {
+  async (formData, thunkApi) => {
     try {
-      const newContact = await $authInstance.post('/contacts', contactData);
-console.log(newContact)
+      const { data } = await $authInstance.post('/contacts', formData);
+console.log(data)
 
-      return newContact;
+      return data;
     } catch (error) {
       return thunkApi.rejectWithValue(error.message);
     }
   }
 );
   
-// 1) Операція видалення контактів
+// 3) Операція видалення контактів
 export const apiDeleteContact = createAsyncThunk(
   'contacts/apiDeleteContact',
   async (contactId, thunkApi) => {

@@ -1,4 +1,5 @@
 import React from 'react'
+import css from './RegisterPage.module.css'
 
 import { useDispatch } from 'react-redux';
 import { apiRegisterUser } from '../../redux/auth/authSlice';
@@ -25,11 +26,11 @@ console.log(name, email, password);
 
 
   return (
-    <div>
-    <h1>RegisterPage</h1>
+    <div className={css.registerContainer}>
+    {/* <h1>RegisterPage</h1> */}
 
-    <form onSubmit={onSubmit}>
-      <label>
+    <form onSubmit={onSubmit} className={css.registerForm}>
+      <label className={css.registerLabel}>
         Name:
         <input
           type="text"
@@ -37,18 +38,20 @@ console.log(name, email, password);
           placeholder="Write your name"
           minLength={2}
           required
+          className={css.registerInput}
         />
       </label>
-      <label>
+      <label className={css.registerLabel}>
         Email:
         <input
           type="email"
           name="userEmail"
           placeholder="your-email@hotmail.ua"
           required
+          className={css.registerInput}
         />
       </label>
-      <label>
+      <label className={css.registerLabel}>
         Password:
         <input
           type="password"
@@ -56,9 +59,10 @@ console.log(name, email, password);
           placeholder="**********"
           minLength={8}
           required
+          className={css.registerInput}
         />
       </label>
-      <button type="submit">Sign Up</button>
+      <button type="submit" className={css.registerButton}>Sign Up</button>
     </form>
   </div>
   )

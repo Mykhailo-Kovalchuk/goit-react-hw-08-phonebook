@@ -10,7 +10,7 @@ import { STATUSES } from '../../utils/constants';
 const ContactList = () => {
   const dispatch = useDispatch();
 
-  const contacts = useSelector(state => state.contacts.contacts.items);
+  const contacts = useSelector(state => state.contacts.contacts);
   const filter = useSelector(state => state.contacts.filter);
 
   const status = useSelector(state => state.contacts.status);
@@ -22,8 +22,12 @@ const ContactList = () => {
 
   const getFilteredContacts = () => {
     const normalizedFilter = filter?.toLowerCase(); ///////////////////?
+    // console.log(normalizedFilter)
+    // console.log(contacts);
     return contacts?.filter(contact => /////////////////////////  ?
-      contact.name.toLowerCase().includes(normalizedFilter)
+    contact.name && contact.name.toLowerCase().includes(normalizedFilter)
+
+      // contact.name
     );
   };
 
@@ -43,7 +47,7 @@ const ContactList = () => {
         {filteredContacts?.map(contact => ( ////////////////////////?
           <li key={contact.id} className={css.contactListItem}>
             <p className={css.contactListText}>
-              {contact.name}: {contact.phone}
+              {contact.name}: {contact.number}
             </p>
             <button
               type="button"

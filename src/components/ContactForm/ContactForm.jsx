@@ -2,16 +2,17 @@
 import css from './contactForm.module.css';
 // import { nanoid } from 'nanoid';
 
-import { useState } from 'react';
+// import { useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { apiAddContact } from '../../redux/contacts/contactsSlice';
 
 const ContactForm = () => {
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
+  // const [name, setName] = useState('');
+  // const [phone, setPhone] = useState('');
   const dispatch = useDispatch();
-  const contacts = useSelector(state => state.contacts.contacts.items);
+  const contacts = useSelector(state => state.contacts.contacts);
+  // console.log(contacts)
 
   const handleFormSubmit = event => {
     event.preventDefault();
@@ -21,22 +22,29 @@ const ContactForm = () => {
     // const phone = form.elements.phone.value;
     // const id = nanoid(5);
     // const formData = { id, name, phone };
-    const formData = { name, phone };
+   
+    const name = event.currentTarget.elements.contactName.value;
+    const number = event.currentTarget.elements.contactNumber.value;
+    const formData = { name, number };
     console.log(formData)
 
     if (
-      contacts.some(
-        contact => contact.name.toLowerCase() === name.toLowerCase()
+      contacts?.some(
+        contact => contact.name && contact.name.toLowerCase() === name.toLowerCase()
       )
     ) {
       alert(`${name} is already in your contacts`);
       return;
     }
 
-    dispatch(apiAddContact(formData));
+    dispatch(apiAddContact(formData))
+    .unwrap()
+    .then(() => {
+      console.log('Contact was successfully added!');
+    }).catch((error) => console.error());;
     // Очистка форми
-    setName('');
-    setPhone('');
+    // setName('');
+    // setPhone('');
   };
 
   return (
@@ -46,10 +54,10 @@ const ContactForm = () => {
         <input
           className={css.contactFormInput}
           type="text"
-          name="name"
+          name="contactName"
           required
-          value={name} // прив'язка до стану name
-          onChange={e => setName(e.target.value)} //  обробник onChange
+          // value={name} // прив'язка до стану name
+          // onChange={e => setName(e.target.value)} //  обробник onChange
           placeholder="Write a name"
         />
       </label>
@@ -59,10 +67,10 @@ const ContactForm = () => {
         <input
           className={css.contactFormInput}
           type="tel"
-          name="number"
+          name="contactNumber"
           required
-          value={phone} //  прив'язка до стану number/phone
-          onChange={e => setPhone(e.target.value)} // Додано обробник onChange
+          // value={phone} //  прив'язка до стану number/phone
+          // onChange={e => setPhone(e.target.value)} // Додано обробник onChange
           placeholder="Write a number"
           // pattern="\d{3}-\d{2}-\d{2}"
           title="xxx-xx-xx"

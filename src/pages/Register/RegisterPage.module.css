@@ -1,0 +1,40 @@
+.registerContainer {
+    margin: 15px auto;
+max-width: 400px;
+}
+
+/* .loginText{
+    font-size: 36px;
+    margin: 5px;
+    font-style: inherit;
+} */
+
+.registerForm {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+gap: 10px;
+
+}
+
+.registerLabel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.registerInput {
+    /* width: 100%; */
+    height: 20px;
+    border: 1px solid black;
+    padding-left: 5px;
+    border-radius: 5px;
+}
+
+.registerButton {
+    height: 25px;
+    border-radius: 5px;
+    border: none;
+    color: black;
+    background-color: cadetblue;
+}
