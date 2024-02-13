@@ -25,8 +25,9 @@ export const App = () => {
 
   // Під час першого рендеру  надсилаємо запит в стан і дивимось чи є там токен, якщо так, тоді підтягуємо його і додаємо в хедерси, щоб користувач був залогований. 
 const dispatch = useDispatch();
-useEffect(() => {dispatch(apiRefreshUser)}, [dispatch])
-
+// useEffect(() => {dispatch(apiRefreshUser)}, [dispatch])  ------ Ось як я робив не правильно, я просто передав метод apiRefreshUser, але не викликав його apiRefreshUser()
+// Ось як правильно:
+useEffect(() => {dispatch(apiRefreshUser())}, [dispatch])
 
 
   return (
